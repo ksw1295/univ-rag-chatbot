@@ -1,0 +1,18 @@
+# 환경 변수 및 인증 정보
+.env
+
+# 원본 및 처리 대상 raw 데이터
+data/raw/
+
+# 벡터 데이터베이스 로컬 저장소
+chroma_db/
+
+# Python 가상환경 및 캐시
+.venv/
+venv/
+env/
+__pycache__/
+*.pyc
+
+# HuggingFace / 모델 캐시
+.cache/
