@@ -3,6 +3,8 @@
 
 # 원본 및 처리 대상 raw 데이터
 data/raw/
+data/chunks.jsonl
+
 
 # 벡터 데이터베이스 로컬 저장소
 chroma_db/
