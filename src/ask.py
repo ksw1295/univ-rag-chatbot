@@ -72,16 +72,27 @@ def ask_question(school_id: str, query: str, top_k: int = 5) -> str:
     return call_llm(prompt).strip()
 
 
+def format_sources(hits: list[dict]) -> str:
+    lines = []
+    for i, h in enumerate(hits, start=1):
+        m = h["meta"]
+        lines.append(f"  {i}. 거리 {h['distance']:.4f} | {m.get('source')} {m.get('article') or '-'} (p{m.get('page')}, {m.get('year')}학년도)")
+    return "\n".join(lines)
+
+
 def main():
     setup_stdout()
     parser = argparse.ArgumentParser(description="대학 규정/학사 RAG 챗봇 질의")
     parser.add_argument("--school", required=True, help="학교 ID (예: kornu, cnsu)")
     parser.add_argument("query", help="질문 내용")
+    parser.add_argument("--sources", action="store_true", help="검색된 상위 조각(거리·문서·조항)도 함께 출력")
     args = parser.parse_args()
 
     answer = ask_question(args.school, args.query)
     print(f"\n[학교]: {args.school}")
     print(f"[질문]: {args.query}")
+    if args.sources:
+        print("[검색된 조각]:\n" + format_sources(retrieve(args.school, args.query)))
     print(f"[답변]:\n{answer}")
 
 

@@ -65,11 +65,12 @@ python -m src.ingest
 * 출력: 학교별 총 조각 수, 본문 조각 수, 표 조각 수
 
 ### Step 2: 벡터 임베딩 및 Chroma DB 인덱싱
-로컬 한국어 임베딩 모델(`nlpai-lab/KURE-v1`, CPU 구동)을 통해 조각별 벡터를 생성하고 Chroma DB에 저장합니다.
+로컬 한국어 임베딩 모델(`nlpai-lab/KURE-v1`)을 통해 조각별 벡터를 생성하고 Chroma DB에 저장합니다. CUDA를 쓸 수 있으면 GPU, 아니면 CPU로 돌며 `UNIV_RAG_DEVICE=cpu` 처럼 직접 지정할 수도 있습니다. CPU에서는 수 분이 걸립니다.
 ```bash
-python -m src.index
+python -m src.index            # 자료(학교·파일) 단위로 옛 기록을 지우고 다시 넣음
+python -m src.index --reset    # 컬렉션을 통째로 지우고 처음부터
 ```
-* 출력: 배치별 임베딩 진행률, 최종 저장된 레코드 수
+* 출력: 진행률(경과 초), 최종 저장된 레코드 수, 걸린 시간
 
 ### Step 3: 질문 및 답변 질의 (ask)
 특정 학교 ID를 지정하여 질문하고, 검색된 문맥을 바탕으로 답변을 받습니다.
@@ -79,10 +80,13 @@ python -m src.ask --school kornu "나사렛대학교의 3대 교육목표는 무
 
 # 충남도립대학교 질의 예시
 python -m src.ask --school cnsu "충남도립대학교 본교의 위치는 어디인가요?"
+
+# 검색된 조각(거리·문서·조항)도 같이 보기
+python -m src.ask --school cnsu --sources "충남도립대학교 본교의 위치는 어디인가요?"
 ```
 
 ### Step 4: 검색 정확도 평가 (Hit@3)
-골든 질문 세트(`eval/questions_kornu.jsonl`, `eval/questions_cnsu.jsonl`)를 대상으로 상위 3개 검색 결과 내 정답 조항 포함 여부(Hit@3)를 평가합니다.
+골든 질문 세트(`eval/questions_<학교ID>.jsonl`)를 대상으로 상위 3개 검색 결과에 **정답 문서(`expected_source`)의 정확한 조항(`expected_article`)**이 있는지(Hit@3) 평가합니다. 자료에 없는 질문(`type: unanswerable`)은 임계값(0.35)에서 실제로 걸러지는지 함께 보여 줍니다.
 > **참고**: 현재 평가 문항은 규정 원문을 기반으로 생성된 **사람 확인 전 초안**입니다.
 ```bash
 python -m eval.run_eval
