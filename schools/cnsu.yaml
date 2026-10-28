@@ -1,0 +1,17 @@
+school_id: cnsu
+name: 충남도립대학교
+homepage: https://www.cnsu.ac.kr
+contact: 교무·학생처(041-635-6669)
+documents:
+  - filename: rule_2026.pdf
+    doc_type: rule
+    year: 2026
+    title: 충남도립대학교 학칙
+  - filename: scholarship_2024.pdf
+    doc_type: scholarship
+    year: 2024
+    title: 충남도립대학교 장학 규정
+  - filename: academic_2025.pdf
+    doc_type: academic
+    year: 2025
+    title: 충남도립대학교 학칙 시행세칙

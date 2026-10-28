@@ -1,0 +1,17 @@
+school_id: kornu
+name: 나사렛대학교
+homepage: https://www.kornu.ac.kr
+contact: 교무처(041-570-1114), 학생장학팀(041-570-7722)
+documents:
+  - filename: rule_2026.pdf
+    doc_type: rule
+    year: 2026
+    title: 나사렛대학교 학칙
+  - filename: scholarship_2026.pdf
+    doc_type: scholarship
+    year: 2026
+    title: 나사렛대학교 장학 규정
+  - filename: academic_2026.pdf
+    doc_type: academic
+    year: 2026
+    title: 나사렛대학교 학사에 관한 규정
