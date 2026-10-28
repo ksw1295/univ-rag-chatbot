@@ -1,6 +1,12 @@
-# 사람 확인 전 초안
-{"question": "충남도립대학교의 교육 목적은 무엇인가요?", "expected_article": "제1조", "expected_fact": "국가 및 지역사회에 필요한 전문지식과 이론을 교수·연구하고 전문직업인을 양성"}
-{"question": "충남도립대학교 본교의 위치는 어디인가요?", "expected_article": "제3조", "expected_fact": "충청남도 청양군 청양읍 학사길 55"}
-{"question": "충남도립대학교에는 어떤 처와 행정 조직이 설치되어 있나요?", "expected_article": "제5조", "expected_fact": "기획홍보처, 교무학생처, 취업지원처, 사무국"}
-{"question": "충남도립대학교 장학위원회는 어떤 사항을 심의·의결하나요?", "expected_article": "제6조", "expected_fact": "장학금 지급 기본방침, 연간계획, 장학생 선발 기준 및 집행 절차"}
-{"question": "충남도립대학교에서 재입학을 지원하려는 자는 어떤 서류를 제출해야 하나요?", "expected_article": "제10조", "expected_fact": "재입학지원서"}
+# 사람 확인 전 초안 (data/raw PDF 원문에서 근거를 찾아 만든 문항. evidence는 해당 조항 조각 안에 실제로 있어야 하며 run_eval이 자동 확인함)
+{"id": "cnsu-s1", "type": "scholarship", "question": "충남도립대학교 장학위원회는 누구로 구성되나요?", "expected_source": "scholarship_2024.pdf", "expected_article": "제4조", "expected_fact": "총장, 기획홍보처장, 교무학생처장, 취업지원처장, 사무국장 및 총장이 임명하는 위원 포함 9명 이내", "evidence": "9명이내로구성한다", "evidence_page": 1}
+{"id": "cnsu-s2", "type": "scholarship", "question": "충남도립대학교 장학위원회는 어떤 사항을 심의·의결하나요?", "expected_source": "scholarship_2024.pdf", "expected_article": "제6조", "expected_fact": "장학금 지급 기본방침, 연간계획 및 전년도 집행현황, 장학생 선발 기준 및 집행 절차", "evidence": "장학생선발기준및집행절차에관한사항", "evidence_page": 2}
+{"id": "cnsu-s3", "type": "scholarship", "question": "충남도립대학교 장학생은 어떤 절차로 선발되나요?", "expected_source": "scholarship_2024.pdf", "expected_article": "제10조", "expected_fact": "위원회에서 의결된 선발기준과 연간계획에 따라 각 학과에서 추천을 받아 총장의 승인으로 선발", "evidence": "각학과에서추천을받아총장의승인으로선발한다", "evidence_page": 2}
+{"id": "cnsu-s4", "type": "scholarship", "question": "충남도립대학교 장학금은 등록금을 내기 전에 받을 수 있나요?", "expected_source": "scholarship_2024.pdf", "expected_article": "제14조", "expected_fact": "등록금 납부 후 후불이 원칙이나, 납부 전에 지급 가능한 장학금은 등록 전에 지급할 수 있음", "evidence": "후불을원칙으로", "evidence_page": 2}
+{"id": "cnsu-s5", "type": "scholarship", "question": "충남도립대학교에서 장학금 지급이 중지되거나 환수되는 경우는 언제인가요?", "expected_source": "scholarship_2024.pdf", "expected_article": "제16조", "expected_fact": "휴학(등록휴학 제외)·자퇴·제적·징계, 허위 신청, 오지급, 규정·지원계획 위반 (장학위원회 심의로 환수 면제 가능)", "evidence": "장학금지급을중지및환수한다", "evidence_page": 3}
+{"id": "cnsu-s6", "type": "scholarship", "question": "충남도립대학교에서 장학금을 이중으로 받을 수 있나요?", "expected_source": "scholarship_2024.pdf", "expected_article": "제17조", "expected_fact": "등록금 지원 성격의 장학금은 등록금 총액을 초과해 받을 수 없음. 생활비성 장학금은 예외", "evidence": "등록금총액을초과하여수혜할수없다", "evidence_page": 3}
+{"id": "cnsu-s7", "type": "scholarship", "question": "충남도립대학교 복지식권 장학금은 어떤 학생이 받을 수 있나요?", "expected_source": "scholarship_2024.pdf", "expected_article": "별표 2", "expected_fact": "소득구간 0~4, 직전학기 성적 70점 이상인 학생", "evidence": "소득구간0~4,직전학기성적이70점이상인자", "evidence_page": 4}
+{"id": "cnsu-r1", "type": "rule", "question": "충남도립대학교 본교의 위치는 어디인가요?", "expected_source": "rule_2026.pdf", "expected_article": "제3조", "expected_fact": "충청남도 청양군 청양읍 학사길 55", "evidence": "충청남도청양군청양읍학사길55", "evidence_page": 2}
+{"id": "cnsu-a1", "type": "academic", "question": "충남도립대학교에서 재입학을 지원하려는 사람은 어떤 서류를 제출해야 하나요?", "expected_source": "academic_2025.pdf", "expected_article": "제10조", "expected_fact": "재입학지원서 [별지 제9호]", "evidence": "재입학지원서", "evidence_page": 3}
+{"id": "cnsu-n1", "type": "unanswerable", "question": "충남도립대학교 대학원 연구조교 장학금은 월 얼마를 지급하나요?", "expected_source": null, "expected_article": null, "expected_fact": "자료에 없음 (대학원·연구조교 장학금은 규정에 없다)"}
+{"id": "cnsu-n2", "type": "unanswerable", "question": "충남도립대학교 외국인 유학생 한국어 우수 장학금은 얼마인가요?", "expected_source": null, "expected_article": null, "expected_fact": "자료에 없음 (외국인 유학생 한국어 우수 장학금은 규정에 없다)"}

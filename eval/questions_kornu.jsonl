@@ -1,6 +1,12 @@
-# 사람 확인 전 초안
-{"question": "나사렛대학교의 3대 교육목표는 무엇인가요?", "expected_article": "제2조", "expected_fact": "진리탐구, 경건생활, 사랑실천"}
-{"question": "나사렛대학교에 설치된 특수대학원에는 어떤 것들이 있나요?", "expected_article": "제3조", "expected_fact": "신학대학원, 사회복지대학원, 미래재활복지대학원"}
-{"question": "나사렛대학교 장학금의 기본 지급 대상 자격은 무엇인가요?", "expected_article": "제6조", "expected_fact": "학업성적 우수자, 가정환경이 어려운 자 등"}
-{"question": "나사렛대학교 장학생 선발 시 동점자가 발생하면 어떤 순서로 우선 선발하나요?", "expected_article": "제7조", "expected_fact": "취득 학점, 이수과목 수, 총점 합계 순"}
-{"question": "나사렛대학교 학사 규정상 수업시간이 중복되는 교과목을 수강하면 어떻게 처리되나요?", "expected_article": "제10조", "expected_fact": "중복 수강할 수 없으며 이수하여도 성적은 0점 처리"}
+# 사람 확인 전 초안 (data/raw PDF 원문에서 근거를 찾아 만든 문항. evidence는 해당 조항 조각 안에 실제로 있어야 하며 run_eval이 자동 확인함)
+{"id": "kornu-s1", "type": "scholarship", "question": "나사렛대학교 장학위원회의 위원장은 누가 되나요?", "expected_source": "scholarship_2026.pdf", "expected_article": "제3조", "expected_fact": "학생지원처장", "evidence": "위원장은학생지원처장이되며", "evidence_page": 1}
+{"id": "kornu-s2", "type": "scholarship", "question": "나사렛대학교 장학금을 받을 수 있는 대상은 어떤 학생들인가요?", "expected_source": "scholarship_2026.pdf", "expected_article": "제6조", "expected_fact": "재학(입학·복학예정 포함)하는 자로서 학업성적 우수자, 가정환경이 어려운 자 등 18개 호 중 하나에 해당", "evidence": "학업성적이우수한자", "evidence_page": 2}
+{"id": "kornu-s3", "type": "scholarship", "question": "나사렛대학교 장학생 선발 시 동점자가 발생하면 어떤 순서로 우선 선발하나요?", "expected_source": "scholarship_2026.pdf", "expected_article": "제7조", "expected_fact": "취득 학점, 이수과목 수, 총점 합계의 순", "evidence": "동점자의경우취득학점,이수과목수,총점합계의순으로우선선발한다", "evidence_page": 2}
+{"id": "kornu-s4", "type": "scholarship", "question": "나사렛대학교에서 장학생으로 선발되려면 직전학기에 몇 학점 이상 이수하고 평점평균이 몇 점 이상이어야 하나요?", "expected_source": "scholarship_2026.pdf", "expected_article": "제8조", "expected_fact": "직전학기 12학점 이상, 평점평균 2.5 이상 (별표에서 따로 정한 경우 예외)", "evidence": "직전학기12학점이상을이수", "evidence_page": 2}
+{"id": "kornu-s5", "type": "scholarship", "question": "나사렛대학교에서 장학금을 중복해서 받게 되면 어떻게 지급되나요?", "expected_source": "scholarship_2026.pdf", "expected_article": "제11조", "expected_fact": "등록금 한도 내에서 지급 (근로장학금 등 일부는 한도 초과 수혜 가능)", "evidence": "중복수혜가발생할시등록금한도내에서장학금을지급", "evidence_page": 3}
+{"id": "kornu-s6", "type": "scholarship", "question": "나사렛대학교 신입생 학업안정 전액장학금은 어떤 학생이 받을 수 있나요?", "expected_source": "scholarship_2026.pdf", "expected_article": "별표 1-2", "expected_fact": "국가장학금 신청자 중 소득분위 0~4분위 신입생, 1년간 등록금 전액", "evidence": "0분위~4분위학생", "evidence_page": 10}
+{"id": "kornu-s7", "type": "scholarship", "question": "나사렛대학교 총장장학금은 어떤 학생에게 지급하나요?", "expected_source": "scholarship_2026.pdf", "expected_article": "별표 1-3", "expected_fact": "학교발전(명예) 및 국가·사회에 기여한 공로가 있다고 인정되는 재학생 (총장 결재 후 예산 범위 내 지급)", "evidence": "학교발전(명예)및국가,사회에기여한공로가", "evidence_page": 12}
+{"id": "kornu-r1", "type": "rule", "question": "나사렛대학교의 3대 교육목표는 무엇인가요?", "expected_source": "rule_2026.pdf", "expected_article": "제2조", "expected_fact": "진리탐구, 경건생활, 사랑실천", "evidence": "3대교육목표를설정하", "evidence_page": 1}
+{"id": "kornu-a1", "type": "academic", "question": "나사렛대학교에서 수업시간이 겹치는 교과목을 함께 수강하면 어떻게 처리되나요?", "expected_source": "academic_2026.pdf", "expected_article": "제10조", "expected_fact": "중복 수강할 수 없으며 이수하여도 성적은 0점 처리", "evidence": "중복수강할수없으며", "evidence_page": 3}
+{"id": "kornu-n1", "type": "unanswerable", "question": "나사렛대학교 e스포츠 특기자 장학금은 얼마를 지원하나요?", "expected_source": null, "expected_article": null, "expected_fact": "자료에 없음 (e스포츠 장학금은 규정에 없다. 가장 가까운 것은 체육우수자 장학금)"}
+{"id": "kornu-n2", "type": "unanswerable", "question": "나사렛대학교 졸업생이 창업에 성공하면 받는 창업동문장학금은 어떻게 신청하나요?", "expected_source": null, "expected_article": null, "expected_fact": "자료에 없음 (창업동문장학금은 규정에 없다)"}
