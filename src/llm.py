@@ -5,7 +5,7 @@ from google import genai
 # .env 파일이 있으면 환경 변수로 로드 (파일 내용을 직접 출력하거나 열어보지 않음)
 load_dotenv()
 
-DEFAULT_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
+DEFAULT_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.0-flash")
 
 
 def call_llm(prompt: str, model_name: str = DEFAULT_MODEL) -> str:

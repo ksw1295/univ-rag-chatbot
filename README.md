@@ -31,7 +31,7 @@ pip install -r requirements.txt
 LLM 응답 생성을 위해 프로젝트 루트 디렉터리에 `.env` 파일을 생성하고 Gemini API 키를 설정합니다.
 ```env
 GEMINI_API_KEY=your_gemini_api_key_here
-GEMINI_MODEL=gemini-2.5-flash
+GEMINI_MODEL=gemini-2.0-flash
 ```
 *(주의: 검색 유사도가 임계값 미만인 경우 LLM을 호출하지 않고 즉시 문의처를 안내하므로, API 키 없이도 필터링 기능은 정상 작동합니다.)*
 
