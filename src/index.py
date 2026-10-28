@@ -3,20 +3,20 @@ import sys
 import json
 import hashlib
 import chromadb
-from sentence_transformers import SentenceTransformer
 
-CHROMA_PATH = r"D:\dev\devSandbox\univ-rag-chatbot\chroma_db"
-CHUNKS_FILE = r"D:\dev\devSandbox\univ-rag-chatbot\data\chunks.jsonl"
-COLLECTION_NAME = "univ_regulations"
-MODEL_NAME = "nlpai-lab/KURE-v1"
+from src.common import (
+    CHROMA_PATH,
+    CHUNKS_FILE,
+    COLLECTION_NAME,
+    MODEL_NAME,
+    get_model,
+    resolve_device,
+    setup_stdout,
+)
 
 
 def run_index(batch_size=64):
-    if sys.stdout.encoding.lower() != 'utf-8':
-        try:
-            sys.stdout.reconfigure(encoding='utf-8')
-        except Exception:
-            pass
+    setup_stdout()
 
     if not os.path.exists(CHUNKS_FILE):
         print(f"[오류] 조각 파일이 없습니다: {CHUNKS_FILE}")
@@ -32,13 +32,13 @@ def run_index(batch_size=64):
                 chunks.append(json.loads(line))
     print(f"로딩된 총 조각 수: {len(chunks)}개")
 
-    print(f"\n=== 2. 임베딩 모델 로딩 ({MODEL_NAME}, CPU) ===")
-    model = SentenceTransformer(MODEL_NAME, device="cpu")
+    print(f"\n=== 2. 임베딩 모델 로딩 ({MODEL_NAME}, {resolve_device()}) ===")
+    model = get_model()
     print("임베딩 모델 로딩 완료.")
 
     print(f"\n=== 3. Chroma DB 연결 ({CHROMA_PATH}) ===")
     os.makedirs(CHROMA_PATH, exist_ok=True)
-    client = chromadb.PersistentClient(path=CHROMA_PATH)
+    client = chromadb.PersistentClient(path=str(CHROMA_PATH))
     try:
         client.delete_collection(name=COLLECTION_NAME)
         print(f"기존 컬렉션 '{COLLECTION_NAME}' 초기화 완료.")
@@ -76,7 +76,7 @@ def run_index(batch_size=64):
         texts = [item[1] for item in batch]
         metadatas = [item[2] for item in batch]
 
-        # 임베딩 생성 (CPU)
+        # 임베딩 생성
         embeddings = model.encode(texts, batch_size=batch_size, show_progress_bar=False, normalize_embeddings=True)
         
         # Chroma upsert

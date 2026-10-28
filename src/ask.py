@@ -1,73 +1,57 @@
-import os
-import sys
 import argparse
-import yaml
-import chromadb
-from sentence_transformers import SentenceTransformer
+
+from src.common import (
+    DISTANCE_THRESHOLD,
+    get_collection,
+    get_model,
+    load_school_config,
+    setup_stdout,
+)
 from src.llm import call_llm
 
-CHROMA_PATH = r"D:\dev\devSandbox\univ-rag-chatbot\chroma_db"
-COLLECTION_NAME = "univ_regulations"
-MODEL_NAME = "nlpai-lab/KURE-v1"
-SCHOOLS_DIR = r"D:\dev\devSandbox\univ-rag-chatbot\schools"
-DISTANCE_THRESHOLD = 0.35  # 코사인 거리 기준 (이보다 크면 검색 유사도 부족으로 판정하여 LLM 미호출)
+
+def retrieve(school_id: str, query: str, top_k: int = 5) -> list[dict]:
+    """school_id 필터로 상위 top_k 조각을 찾는다. 가까운 순서이며 distance는 코사인 거리."""
+    query_emb = get_model().encode([query], normalize_embeddings=True).tolist()
+    results = get_collection().query(
+        query_embeddings=query_emb,
+        n_results=top_k,
+        where={"school_id": {"$eq": school_id}},
+    )
+    docs = results.get("documents", [[]])[0]
+    metas = results.get("metadatas", [[]])[0]
+    distances = results.get("distances", [[]])[0]
+    return [{"text": d, "meta": m, "distance": x} for d, m, x in zip(docs, metas, distances)]
 
 
-
-def load_school_config(school_id: str) -> dict:
-    yaml_path = os.path.join(SCHOOLS_DIR, f"{school_id}.yaml")
-    if not os.path.exists(yaml_path):
-        raise FileNotFoundError(f"학교 설정 파일을 찾을 수 없습니다: {yaml_path}")
-    with open(yaml_path, "r", encoding="utf-8") as f:
-        return yaml.safe_load(f)
+def is_answerable(hits: list[dict]) -> bool:
+    """가장 가까운 조각이 임계값 안이면 LLM에 넘길 만한 근거가 있다고 본다."""
+    return bool(hits) and hits[0]["distance"] <= DISTANCE_THRESHOLD
 
 
 def ask_question(school_id: str, query: str, top_k: int = 5) -> str:
-    # 1. 학교 설정 로드
     cfg = load_school_config(school_id)
     school_name = cfg.get("name", school_id)
     contact = cfg.get("contact", "").strip() or "해당 부서"
 
-    # 2. Chroma DB 및 임베딩 모델 연결
-    client = chromadb.PersistentClient(path=CHROMA_PATH)
-    collection = client.get_collection(name=COLLECTION_NAME)
-    model = SentenceTransformer(MODEL_NAME, device="cpu")
-
-    # 3. 질문 임베딩 생성 및 검색 (where={'school_id': school_id} 필수 필터)
-    query_emb = model.encode([query], normalize_embeddings=True).tolist()
-    results = collection.query(
-        query_embeddings=query_emb,
-        n_results=top_k,
-        where={"school_id": {"$eq": school_id}}
-    )
-
-    docs = results.get("documents", [[]])[0]
-    metas = results.get("metadatas", [[]])[0]
-    distances = results.get("distances", [[]])[0]
-
-    if not docs:
+    hits = retrieve(school_id, query, top_k)
+    if not hits:
         return f"자료에서 찾지 못함, {contact}로 문의"
 
-    # 4. 검색 점수 임계값 검사 (가장 유사한 문서의 코사인 거리)
-    best_distance = distances[0]
-    if best_distance > DISTANCE_THRESHOLD:
+    if not is_answerable(hits):
         return (
             f"자료에서 찾지 못함, {contact}로 문의\n\n"
-            f"(최고 유사도 거리 {best_distance:.4f}가 임계값 {DISTANCE_THRESHOLD}보다 커서 LLM 호출을 생략했습니다.)"
+            f"(최고 유사도 거리 {hits[0]['distance']:.4f}가 임계값 {DISTANCE_THRESHOLD}보다 커서 LLM 호출을 생략했습니다.)"
         )
 
-    # 5. 프롬프트 구성 (학교 정보, 컨텍스트, 질문)
     contexts = []
-    sources_summary = []
-    for idx, (doc, meta, dist) in enumerate(zip(docs, metas, distances), start=1):
-        src = meta.get("source", "")
-        art = meta.get("article", "")
-        yr = meta.get("year", "")
-        pg = meta.get("page", "")
-        ref = f"문서: {src}, 조항: {art or '본문/표'}, 학년도: {yr}년, 쪽: {pg}쪽"
-        contexts.append(f"[자료 {idx}] ({ref})\n{doc}")
-        sources_summary.append(ref)
-
+    for idx, h in enumerate(hits, start=1):
+        meta = h["meta"]
+        ref = (
+            f"문서: {meta.get('source', '')}, 조항: {meta.get('article') or '본문/표'}, "
+            f"학년도: {meta.get('year', '')}년, 쪽: {meta.get('page', '')}쪽"
+        )
+        contexts.append(f"[자료 {idx}] ({ref})\n{h['text']}")
     context_str = "\n\n".join(contexts)
 
     prompt = f"""당신은 {school_name} 규정 및 학사/장학 안내 전문 챗봇입니다.
@@ -85,18 +69,11 @@ def ask_question(school_id: str, query: str, top_k: int = 5) -> str:
 
 [답변]"""
 
-    # 6. LLM 호출
-    answer = call_llm(prompt)
-    return answer.strip()
+    return call_llm(prompt).strip()
 
 
 def main():
-    if sys.stdout.encoding.lower() != 'utf-8':
-        try:
-            sys.stdout.reconfigure(encoding='utf-8')
-        except Exception:
-            pass
-
+    setup_stdout()
     parser = argparse.ArgumentParser(description="대학 규정/학사 RAG 챗봇 질의")
     parser.add_argument("--school", required=True, help="학교 ID (예: kornu, cnsu)")
     parser.add_argument("query", help="질문 내용")
