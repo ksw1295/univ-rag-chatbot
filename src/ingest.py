@@ -107,6 +107,15 @@ def article_label(num, sub):
     return f"제{num}조의{sub}" if sub else f"제{num}조"
 
 
+def attachment_label(text):
+    """본문 안에 별표·별지 머리가 있으면 그 이름(예: "별표 2")을, 없으면 빈 문자열."""
+    for raw in text.splitlines():
+        a = ATTACHMENT_HEAD_RE.match(raw.strip())
+        if a:
+            return f"{a.group(1)} {a.group(2)}"
+    return ""
+
+
 def header_prefix(school_name, doc_title):
     """조각 머리말 앞부분. 문서명이 이미 학교명으로 시작하면 학교명을 반복하지 않는다."""
     return doc_title if doc_title.startswith(school_name) else f"{school_name} {doc_title}"
@@ -153,11 +162,12 @@ def ingest_document(pdf_path, school_id, school_name, doc_title, year, doc_type,
             for region_idx, (region, text) in enumerate(zip(regions, texts)):
                 if region_idx > 0:
                     in_supplement = False  # 모아찍기 오른쪽 반쪽은 왼쪽 부칙과 이어지지 않는 새 흐름으로 본다
-                # 1. 표 (현재 조항 이름을 붙임)
+                # 1. 표 (현재 조항 이름을 붙이되, 별표·별지 쪽의 표는 그 별표 이름을 따른다)
+                table_label = attachment_label(text) or label
                 for t in region.extract_tables():
                     if is_real_table(t):
-                        tag = f" {label}" if label else ""
-                        add_chunk(f"[{prefix}{tag} - {page_idx}쪽 표]\n{table_to_markdown(t)}", page_idx, label, True)
+                        tag = f" {table_label}" if table_label else ""
+                        add_chunk(f"[{prefix}{tag} - {page_idx}쪽 표]\n{table_to_markdown(t)}", page_idx, table_label, True)
 
                 # 2. 본문: 줄 단위로 읽으며 조항·별표·부칙 머리에서만 끊는다
                 seg_label = label
