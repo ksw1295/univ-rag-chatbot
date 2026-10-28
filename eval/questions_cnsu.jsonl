@@ -1,0 +1,6 @@
+# 사람 확인 전 초안
+{"question": "충남도립대학교의 교육 목적은 무엇인가요?", "expected_article": "제1조", "expected_fact": "국가 및 지역사회에 필요한 전문지식과 이론을 교수·연구하고 전문직업인을 양성"}
+{"question": "충남도립대학교 본교의 위치는 어디인가요?", "expected_article": "제3조", "expected_fact": "충청남도 청양군 청양읍 학사길 55"}
+{"question": "충남도립대학교에는 어떤 처와 행정 조직이 설치되어 있나요?", "expected_article": "제5조", "expected_fact": "기획홍보처, 교무학생처, 취업지원처, 사무국"}
+{"question": "충남도립대학교 장학위원회는 어떤 사항을 심의·의결하나요?", "expected_article": "제6조", "expected_fact": "장학금 지급 기본방침, 연간계획, 장학생 선발 기준 및 집행 절차"}
+{"question": "충남도립대학교에서 재입학을 지원하려는 자는 어떤 서류를 제출해야 하나요?", "expected_article": "제10조", "expected_fact": "재입학지원서"}

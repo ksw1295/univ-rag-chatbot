@@ -1,0 +1,6 @@
+# 사람 확인 전 초안
+{"question": "나사렛대학교의 3대 교육목표는 무엇인가요?", "expected_article": "제2조", "expected_fact": "진리탐구, 경건생활, 사랑실천"}
+{"question": "나사렛대학교에 설치된 특수대학원에는 어떤 것들이 있나요?", "expected_article": "제3조", "expected_fact": "신학대학원, 사회복지대학원, 미래재활복지대학원"}
+{"question": "나사렛대학교 장학금의 기본 지급 대상 자격은 무엇인가요?", "expected_article": "제6조", "expected_fact": "학업성적 우수자, 가정환경이 어려운 자 등"}
+{"question": "나사렛대학교 장학생 선발 시 동점자가 발생하면 어떤 순서로 우선 선발하나요?", "expected_article": "제7조", "expected_fact": "취득 학점, 이수과목 수, 총점 합계 순"}
+{"question": "나사렛대학교 학사 규정상 수업시간이 중복되는 교과목을 수강하면 어떻게 처리되나요?", "expected_article": "제10조", "expected_fact": "중복 수강할 수 없으며 이수하여도 성적은 0점 처리"}
