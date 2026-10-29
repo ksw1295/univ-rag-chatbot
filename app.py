@@ -304,6 +304,9 @@ school_theme_colors = {
 }
 c1, c2 = school_theme_colors.get(selected_school, ("#1E3A8A", "#2563EB"))
 
+msg_count = len(current_messages) // 2
+count_badge = f" (진행 질의 {msg_count}건)" if msg_count > 0 else ""
+
 st.markdown(
     f"""
     <div style="background: linear-gradient(135deg, {c1} 0%, {c2} 100%); padding: 26px 30px; border-radius: 16px; color: white; margin-bottom: 22px; box-shadow: 0 4px 15px rgba(30, 58, 138, 0.12);">
