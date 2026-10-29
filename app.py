@@ -21,8 +21,44 @@ st.markdown(
     <style>
     @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
     
-    html, body, [class*="css"], [class*="st-"] {
-        font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif !important;
+    @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200');
+    
+    /* 1. 기본 본문 텍스트에만 Pretendard 적용 (아이콘 폰트 간섭 방지) */
+    html, body {
+        font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+    }
+    
+    /* 텍스트 요소 폰트 지정 */
+    p, span:not([data-testid="stIcon"]):not([class*="material-"]):not([aria-hidden="true"]), 
+    div:not([data-testid="stIcon"]):not([class*="material-"]):not([aria-hidden="true"]), 
+    input, textarea, select, h1, h2, h3, h4, h5, h6 {
+        font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+    }
+
+    /* 2. Material Symbols / Streamlit 내장 아이콘 폰트 강제 복원 (keyboard_double, arrow_down 텍스트 노출 버그 해결) */
+    [data-testid="stIcon"],
+    [data-testid="stIcon"] *,
+    [data-testid="stSidebarCollapseButton"] *,
+    [data-testid="stSidebarHeader"] button *,
+    [data-testid="stExpanderToggleIcon"],
+    [data-testid="stExpanderToggleIcon"] *,
+    button[data-testid*="Collapse"] *,
+    div[data-testid="stExpander"] summary svg,
+    div[data-testid="stExpander"] summary span:first-child,
+    .material-symbols-rounded,
+    .material-symbols-outlined,
+    .material-icons {
+        font-family: 'Material Symbols Rounded', 'Material Symbols Outlined', 'Material Icons', sans-serif !important;
+        font-style: normal !important;
+        font-weight: normal !important;
+        line-height: 1 !important;
+        letter-spacing: normal !important;
+        text-transform: none !important;
+        display: inline-block !important;
+        white-space: nowrap !important;
+        word-wrap: normal !important;
+        direction: ltr !important;
+        -webkit-font-smoothing: antialiased !important;
     }
     
     /* 메인 배경색 및 여백 조정 */
@@ -59,6 +95,28 @@ st.markdown(
     section[data-testid="stSidebar"] {
         background-color: #F8FAFC !important;
         border-right: 1px solid #E2E8F0 !important;
+    }
+
+    /* 사이드바 상단 여백 및 닫기 버튼 정돈 */
+    [data-testid="stSidebarHeader"] {
+        padding-top: 0.8rem !important;
+        padding-bottom: 0.4rem !important;
+    }
+
+    /* Expander 접이식 박스 스타일링 및 아이콘 겹침 방지 */
+    div[data-testid="stExpander"] {
+        border: 1px solid #E2E8F0 !important;
+        border-radius: 10px !important;
+        background-color: #FFFFFF !important;
+        margin-bottom: 14px !important;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.02) !important;
+    }
+    div[data-testid="stExpander"] summary {
+        border-radius: 10px !important;
+        padding: 8px 12px !important;
+    }
+    div[data-testid="stExpander"] summary:hover {
+        background-color: #F8FAFC !important;
     }
     
     /* 카드 컴포넌트 */
