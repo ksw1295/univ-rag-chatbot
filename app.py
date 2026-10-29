@@ -4,7 +4,7 @@ from src.common import (
     load_school_config,
     list_school_ids,
 )
-from src.ask import retrieve, is_answerable
+from src.ask import retrieve, is_answerable, rewrite_query
 from src.llm import call_llm, get_model_name
 
 # 1. 페이지 기본 설정
@@ -144,9 +144,9 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# 3. 세션 상태 초기화
-if "messages" not in st.session_state:
-    st.session_state.messages = []
+# 3. 세션 상태 초기화 (대학별 독립 대화 채널 분리)
+if "school_messages" not in st.session_state:
+    st.session_state.school_messages = {}
 if "faq_prompt" not in st.session_state:
     st.session_state.faq_prompt = None
 
@@ -184,6 +184,19 @@ with st.sidebar:
         format_func=lambda sid: school_options.get(sid, sid),
         index=0,
     )
+
+    if "current_school" not in st.session_state:
+        st.session_state.current_school = selected_school
+    elif st.session_state.current_school != selected_school:
+        st.session_state.current_school = selected_school
+        st.session_state.faq_prompt = None
+        st.rerun()
+
+    # 대학별 독립 대화 채널 바인딩
+    if selected_school not in st.session_state.school_messages:
+        st.session_state.school_messages[selected_school] = []
+    current_messages = st.session_state.school_messages[selected_school]
+    st.session_state.messages = current_messages
 
     curr_cfg = school_meta.get(selected_school, {})
     school_name = curr_cfg.get("name", selected_school)
@@ -234,8 +247,13 @@ with st.sidebar:
             unsafe_allow_html=True,
         )
 
-    if st.button("🗑️ 대화 내용 비우기", use_container_width=True):
-        st.session_state.messages = []
+    col_c1, col_c2 = st.columns(2)
+    if col_c1.button(f"🗑️ 현재 대학 비우기", use_container_width=True):
+        st.session_state.school_messages[selected_school] = []
+        st.session_state.faq_prompt = None
+        st.rerun()
+    if col_c2.button("🧹 전체 대학 비우기", use_container_width=True):
+        st.session_state.school_messages = {sid: [] for sid in school_ids}
         st.session_state.faq_prompt = None
         st.rerun()
 
@@ -250,7 +268,7 @@ st.markdown(
     f"""
     <div style="background: linear-gradient(135deg, {c1} 0%, {c2} 100%); padding: 26px 30px; border-radius: 16px; color: white; margin-bottom: 22px; box-shadow: 0 4px 15px rgba(30, 58, 138, 0.12);">
         <span style="background: rgba(255, 255, 255, 0.22); padding: 5px 12px; border-radius: 20px; font-size: 12.5px; font-weight: 600; letter-spacing: 0.3px;">
-            공식 규정 원문 근거 챗봇
+            🏛️ {school_name} 전용 독립 상담 채널
         </span>
         <h2 style="color: white; margin: 10px 0 6px 0; font-size: 23px; font-weight: 700; letter-spacing: -0.5px;">
             {school_name} 학사·장학 규정 도우미
@@ -292,8 +310,8 @@ for idx, q_text in enumerate(faqs):
 
 st.markdown("<div style='height: 14px;'></div>", unsafe_allow_html=True)
 
-# 7. 대화 내역 렌더링
-for msg in st.session_state.messages:
+# 7. 대화 내역 렌더링 (현재 대학 독립 채널)
+for msg in current_messages:
     with st.chat_message(msg["role"]):
         st.markdown(msg["content"])
         
@@ -301,7 +319,10 @@ for msg in st.session_state.messages:
         hits = msg.get("hits")
         if hits and msg["role"] == "assistant":
             is_unanswerable = msg.get("unanswerable", False)
+            search_q = msg.get("search_query")
             with st.expander("📖 공식 규정집 발췌 근거 및 조항 확인", expanded=False):
+                if search_q:
+                    st.caption(f"🔍 맥락 반영 검색어: **{search_q}**")
                 if is_unanswerable:
                     st.warning(
                         f"⚠️ 규정집 검색 결과와의 유사도 거리({hits[0]['distance']:.4f})가 신뢰 기준을 벗어나 "
@@ -342,13 +363,20 @@ if st.session_state.faq_prompt:
     st.session_state.faq_prompt = None
 
 if user_input:
-    st.session_state.messages.append({"role": "user", "content": user_input})
+    # 1. 현재 대학 전용 직전 대화 기록 확보 (재작성용)
+    prev_history = list(current_messages)
+
+    current_messages.append({"role": "user", "content": user_input})
     with st.chat_message("user"):
         st.markdown(user_input)
 
     with st.chat_message("assistant"):
         with st.spinner("대학 규정집 검색 및 사실 검증 중..."):
-            hits = retrieve(selected_school, user_input, top_k=5)
+            # 2. 대화 맥락이 있을 경우 꼬리 질문을 완전한 독립 질의로 재작성
+            search_query = rewrite_query(school_name, prev_history, user_input)
+
+            # 3. 규정집 벡터 검색 수행
+            hits = retrieve(selected_school, search_query, top_k=5)
             
             if not hits:
                 ans_text = f"해당 내용은 대학 규정집에서 명시적인 근거를 찾지 못했습니다. 보다 정확한 확인을 위해 **{school_name} {contact_info}**로 직접 문의해 주시기 바랍니다."
@@ -372,6 +400,8 @@ if user_input:
                     contexts.append(f"[자료 {idx}] ({ref})\n{h['text']}")
                 context_str = "\n\n".join(contexts)
 
+                query_context = f"{user_input} (검색 의도: {search_query})" if search_query != user_input else user_input
+
                 prompt = f"""당신은 {school_name} 규정 및 학사/장학 안내 전문 챗봇입니다.
 반드시 아래 제공된 [참고자료]의 내용에만 근거하여 질문에 사실대로 명확하게 답변하십시오.
 제공된 자료에 언급되지 않은 사실을 추측하여 답변하거나 외부 지식을 지어내지 마십시오.
@@ -383,7 +413,7 @@ if user_input:
 {context_str}
 
 [질문]
-{user_input}
+{query_context}
 
 [답변]"""
                 ans_text = call_llm(prompt).strip()
@@ -392,6 +422,8 @@ if user_input:
 
             if hits:
                 with st.expander("📖 공식 규정집 발췌 근거 및 조항 확인", expanded=False):
+                    if search_query != user_input:
+                        st.caption(f"🔍 맥락 반영 검색어: **{search_query}**")
                     if unanswerable:
                         st.warning(
                             f"⚠️ 규정집 검색 결과와의 유사도 거리({hits[0]['distance']:.4f})가 신뢰 기준을 벗어나 "
@@ -424,9 +456,10 @@ if user_input:
                             unsafe_allow_html=True,
                         )
 
-    st.session_state.messages.append({
+    current_messages.append({
         "role": "assistant",
         "content": ans_text,
         "hits": hits,
         "unanswerable": unanswerable,
+        "search_query": search_query,
     })

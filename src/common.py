@@ -16,7 +16,7 @@ CHROMA_PATH = Path(os.environ.get("UNIV_RAG_CHROMA_DIR") or ROOT / "chroma_db")
 COLLECTION_NAME = "univ_regulations"
 MODEL_NAME = "nlpai-lab/KURE-v1"
 MAX_SEQ_LENGTH = 512  # 조각 대부분은 이보다 짧음. 긴 표 조각의 꼬리만 잘리고 CPU 시간이 크게 줄어듦
-DISTANCE_THRESHOLD = 0.35  # 코사인 거리 기준 (이보다 크면 검색 유사도 부족으로 판정하여 LLM 미호출)
+DISTANCE_THRESHOLD = float(os.environ.get("UNIV_RAG_DISTANCE_THRESHOLD", "0.38"))  # 코사인 거리 기준 (이보다 크면 검색 유사도 부족으로 판정하여 LLM 미호출)
 
 
 def setup_stdout():
